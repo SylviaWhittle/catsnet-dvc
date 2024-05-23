@@ -1,0 +1,6 @@
+outs:
+- md5: 6a8177864edefe40733884f205240ce7.dir
+  size: 141041642
+  nfiles: 159
+  hash: md5
+  path: cropped_images
