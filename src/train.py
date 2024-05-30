@@ -3,21 +3,24 @@ from typing import Tuple
 from PIL import Image
 from loguru import logger
 from datetime import datetime
-import matplotlib.pyplot as plt
+import re
 
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from dvclive import Live
 from dvclive.keras import DVCLiveCallback
+from ruamel.yaml import YAML
 
 from unet import unet_model
+
+yaml = YAML(typ="safe")
 
 
 # generator for data
 def image_data_generator(
-    image_dir: Path,
-    ground_truth_dir: Path,
+    data_dir: Path,
     image_indexes: np.ndarray,
     batch_size: int,
     model_image_size: Tuple[int, int],
@@ -35,8 +38,8 @@ def image_data_generator(
         # Load images and ground truth
         for index in batch_indexes:
             # Load the image and ground truth
-            image = np.load(image_dir / f"image_{index}.npy")
-            ground_truth = np.load(ground_truth_dir / f"mask_{index}.npy").astype(bool)
+            image = np.load(data_dir / f"image_{index}.npy")
+            ground_truth = np.load(data_dir / f"mask_{index}.npy").astype(bool)
 
             # TODO: Augment the images: Scale and translate
 
@@ -64,43 +67,62 @@ def image_data_generator(
         batch_x = np.array(batch_input).astype(np.float32)
         batch_y = np.array(batch_output).astype(np.float32)
 
+        # logger.info(f"Batch x shape: {batch_x.shape}")
+        # logger.info(f"Batch y shape: {batch_y.shape}")
+
         yield (batch_x, batch_y)
 
 
 def train_model(
-    image_dir: Path,
-    ground_truth_dir: Path,
+    random_seed: int,
+    train_data_dir: Path,
     model_save_dir: Path,
     model_image_size: Tuple[int, int],
     batch_size: int,
     epochs: int,
     norm_upper_bound: float,
     norm_lower_bound: int,
-    test_size: float,
+    validation_split: float,
 ):
     """Train a model to segment images."""
 
-    # Set the random seed
-    seed = 0
-    np.random.seed(seed)
-    tf.random.set_seed(seed)
+    logger.info("Training: Setup")
 
-    # Find the maximum index of images and ground truth
-    num_images = len(list(image_dir.glob("image_*.npy")))
-    num_masks = len(list(ground_truth_dir.glob("mask_*.npy")))
-    if num_images != num_masks:
-        raise ValueError("Different number of images and masks.")
+    logger.info("Training: Parameters:")
+    logger.info(f"|  Random seed: {random_seed}")
+    logger.info(f"|  Train data directory: {train_data_dir}")
+    logger.info(f"|  Model save directory: {model_save_dir}")
+    logger.info(f"|  Model image size: {model_image_size}")
+    logger.info(f"|  Batch size: {batch_size}")
+    logger.info(f"|  Epochs: {epochs}")
+    logger.info(f"|  Normalisation upper bound: {norm_upper_bound}")
+    logger.info(f"|  Normalisation lower bound: {norm_lower_bound}")
+    logger.info(f"|  Test size: {validation_split}")
+
+    # Set the random seed
+    np.random.seed(random_seed)
+    tf.random.set_seed(random_seed)
+
+    logger.info("Training: Loading data")
+    # Find the indexes of all the image files in the format of image_<index>.npy
+    image_indexes = [int(re.search(r"\d+", file.name).group()) for file in train_data_dir.glob("image_*.npy")]
+    mask_indexes = [int(re.search(r"\d+", file.name).group()) for file in train_data_dir.glob("mask_*.npy")]
+
+    # Check that the image and mask indexes are the same
+    if set(image_indexes) != set(mask_indexes):
+        raise ValueError(f"Different image and mask indexes : {image_indexes} and {mask_indexes}")
 
     # Train test split
-    image_indexes = range(0, num_images)
-
-    # Create an image data generator
-    train_indexes, validation_indexes = train_test_split(image_indexes, test_size=test_size, random_state=SEED)
+    train_indexes, validation_indexes = train_test_split(
+        image_indexes, test_size=validation_split, random_state=random_seed
+    )
     logger.info(f"Training on {len(train_indexes)} images | validating on {len(validation_indexes)} images.")
 
+    # Create an image data generator
+    logger.info("Training: Creating data generators")
+
     train_generator = image_data_generator(
-        image_dir=image_dir,
-        ground_truth_dir=ground_truth_dir,
+        data_dir=train_data_dir,
         image_indexes=train_indexes,
         batch_size=batch_size,
         model_image_size=model_image_size,
@@ -109,8 +131,7 @@ def train_model(
     )
 
     validation_generator = image_data_generator(
-        image_dir=image_dir,
-        ground_truth_dir=ground_truth_dir,
+        data_dir=train_data_dir,
         image_indexes=validation_indexes,
         batch_size=batch_size,
         model_image_size=model_image_size,
@@ -119,14 +140,17 @@ def train_model(
     )
 
     # Load the model
+    logger.info("Training: Loading model")
     model = unet_model(IMG_HEIGHT=model_image_size[0], IMG_WIDTH=model_image_size[1], IMG_CHANNELS=1)
 
     steps_per_epoch = len(train_indexes) // batch_size
     logger.info(f"Steps per epoch: {steps_per_epoch}")
 
     # At the end of each epoch, DVCLive will log the metrics
-    with Live() as live:
+    logger.info("Using DVCLive to log the metrics.")
+    with Live("results/train") as live:
 
+        logger.info("Training the model.")
         history = model.fit(
             train_generator,
             steps_per_epoch=steps_per_epoch,
@@ -137,8 +161,18 @@ def train_model(
             callbacks=[DVCLiveCallback(live=live)],
         )
 
-        model.save("mymodel")
-        live.log_artifact("mymodel", type="model")
+        logger.info("Training: Finished training.")
+
+        logger.info(f"Training: Saving model to {model_save_dir}")
+        model.save(Path(model_save_dir) / "catsnet_model.keras")
+        live.log_artifact(
+            str(Path(model_save_dir) / "catsnet_model.keras"),
+            type="model",
+            name="catsnet_model",
+            desc="Model trained to segment cats.",
+            labels=["cv", "segmentation"],
+        )
+        logger.info("Training: Finished.")
 
         # loss = history.history["loss"]
         # val_loss = history.history["val_loss"]
@@ -156,4 +190,29 @@ def train_model(
         # Save the model
         # model.save(model_save_dir / f"model_{date}.h5")
 
-        # Report the accuracy to dvclive
+
+if __name__ == "__main__":
+    logger.info("Train: Loading the parameters from the params.yaml config file.")
+    # Get the parameters from the params.yaml config file
+    with open(Path("./params.yaml"), "r") as file:
+        all_params = yaml.load(file)
+        base_params = all_params["base"]
+        train_params = all_params["train"]
+
+    logger.info("Train: Converting the paths to Path objects.")
+    # Convert the paths to Path objects
+    train_data_dir = Path(train_params["train_data_dir"])
+    model_save_dir = Path(train_params["model_save_dir"])
+
+    # Train the model
+    train_model(
+        random_seed=base_params["random_seed"],
+        train_data_dir=train_data_dir,
+        model_save_dir=model_save_dir,
+        model_image_size=(base_params["model_image_size"], base_params["model_image_size"]),
+        batch_size=train_params["batch_size"],
+        epochs=train_params["epochs"],
+        norm_upper_bound=train_params["norm_upper_bound"],
+        norm_lower_bound=train_params["norm_lower_bound"],
+        validation_split=train_params["validation_split"],
+    )

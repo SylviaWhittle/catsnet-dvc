@@ -100,7 +100,7 @@ def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS):
     outputs = Conv2D(1, kernel_size=(1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", dice_loss, iou_loss])
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
     model.summary()
 
     return model
