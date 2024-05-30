@@ -1,0 +1,100 @@
+schema: '2.0'
+stages:
+  data_split:
+    cmd: python src/data_split.py
+    deps:
+    - path: data/all_data/
+      hash: md5
+      md5: 15f848fc495bd9d650462e65288f286c.dir
+      size: 157899315
+      nfiles: 317
+    - path: src/data_split.py
+      hash: md5
+      md5: 8d802fe12f83502b7c7c0c012e469f4f
+      size: 3465
+    params:
+      params.yaml:
+        base:
+          random_seed: 0
+          model_image_size: 256
+        data_split:
+          test_split: 0.1
+          data_dir: data/all_data/
+          train_data_dir: data/train/
+          test_data_dir: data/test/
+    outs:
+    - path: data/test
+      hash: md5
+      md5: fbda72b076bb16a356fc4e587f0d16f8.dir
+      size: 13189121
+      nfiles: 32
+    - path: data/train
+      hash: md5
+      md5: 014bfac42b32eee9e2669ceca8482b8b.dir
+      size: 144704046
+      nfiles: 284
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/train/
+      hash: md5
+      md5: 014bfac42b32eee9e2669ceca8482b8b.dir
+      size: 144704046
+      nfiles: 284
+    - path: src/train.py
+      hash: md5
+      md5: 303bc875a0506c582c98775ebad636c4
+      size: 7798
+    params:
+      params.yaml:
+        base:
+          random_seed: 0
+          model_image_size: 256
+        train:
+          train_data_dir: data/train/
+          model_save_dir: models/
+          batch_size: 2
+          epochs: 5
+          norm_upper_bound: 7
+          norm_lower_bound: -1
+          validation_split: 0.2
+    outs:
+    - path: models/catsnet_model.keras
+      hash: md5
+      md5: 04b89e17ac0d723f9e1a9e1a971476fc
+      size: 23454939
+    - path: results/train/
+      hash: md5
+      md5: a20516ccf745ed754c15247d9867ae2c.dir
+      size: 690
+      nfiles: 5
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/test/
+      hash: md5
+      md5: fbda72b076bb16a356fc4e587f0d16f8.dir
+      size: 13189121
+      nfiles: 32
+    - path: models/catsnet_model.keras
+      hash: md5
+      md5: 04b89e17ac0d723f9e1a9e1a971476fc
+      size: 23454939
+    - path: src/evaluate.py
+      hash: md5
+      md5: 67f3ea9acc63e897432fddf0bd2908c8
+      size: 3760
+    params:
+      params.yaml:
+        base:
+          random_seed: 0
+          model_image_size: 256
+        evaluate:
+          model_path: models/catsnet_model.keras
+          test_data_dir: data/test/
+    outs:
+    - path: results/evaluate/
+      hash: md5
+      md5: 79893301a023947320d1c899d8217f91.dir
+      size: 41
+      nfiles: 1
