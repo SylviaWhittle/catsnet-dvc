@@ -1,2 +1,5 @@
 /cropped_labels
 /cropped_images
+/train
+/test
+/all_data
