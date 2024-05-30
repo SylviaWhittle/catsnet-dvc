@@ -53,7 +53,7 @@ stages:
         train:
           train_data_dir: data/train/
           model_save_dir: models/
-          batch_size: 2
+          batch_size: 6
           epochs: 5
           norm_upper_bound: 7
           norm_lower_bound: -1
@@ -61,12 +61,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 04b89e17ac0d723f9e1a9e1a971476fc
+      md5: 9c5dd66ef65490711024563e8d6c604b
       size: 23454939
     - path: results/train/
       hash: md5
-      md5: a20516ccf745ed754c15247d9867ae2c.dir
-      size: 690
+      md5: 60281b02178ac14a7f481c3780f8af2b.dir
+      size: 688
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -78,7 +78,7 @@ stages:
       nfiles: 32
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 04b89e17ac0d723f9e1a9e1a971476fc
+      md5: 9c5dd66ef65490711024563e8d6c604b
       size: 23454939
     - path: src/evaluate.py
       hash: md5
@@ -95,6 +95,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 79893301a023947320d1c899d8217f91.dir
-      size: 41
+      md5: 5832e6c10ced2ae82e9e76cca8e123d1.dir
+      size: 40
       nfiles: 1

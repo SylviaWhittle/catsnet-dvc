@@ -9,7 +9,7 @@ data_split:
 train:
   train_data_dir: data/train/
   model_save_dir: models/
-  batch_size: 2
+  batch_size: 6
   epochs: 5
   norm_upper_bound: 7
   norm_lower_bound: -1
