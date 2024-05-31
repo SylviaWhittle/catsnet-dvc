@@ -101,9 +101,7 @@ def evaluate(
             dice_score = dice(mask_predicted, mask)
             dice_multi += dice_score / len(image_indexes)
 
-            # Plot the image, mask and predicted mask and save it to the results/evaluate/image_plots directory
-            plot_save_dir = Path("results/evaluate_plots")
-            plot_save_dir.mkdir(parents=True, exist_ok=True)
+            # Plot the image, mask and predicted mask and log it
             num_channels = mask_predicted.shape[-1]
             fig, ax = plt.subplots(num_channels, 3, figsize=(15, 5))
             if num_channels == 1:
@@ -121,7 +119,8 @@ def evaluate(
                     ax[i, 1].set_title(f"Ground Truth Mask Channel {i}")
                     ax[i, 2].imshow(mask_predicted[:, :, i], cmap="binary")
                     ax[i, 2].set_title(f"Predicted Mask Channel {i}")
-            plt.savefig(f"{plot_save_dir}/test_image_{index}.png")
+            # plt.savefig(f"{plot_save_dir}/test_image_{index}.png")
+            live.log_image(f"test_image_plot_{index}.png", fig)
 
         live.summary["dice_multi"] = dice_multi
 

@@ -32,13 +32,13 @@ stages:
     - evaluate
     outs:
     - results/evaluate/
-    - results/evaluate_plots/
 metrics:
 - results/train/metrics.json
 - results/evaluate/metrics.json
 plots:
 - results/train/plots/metrics:
     x: step
+- results/evaluate/plots/images
 artifacts:
   catsnet_model:
     path: models/catsnet_model.keras

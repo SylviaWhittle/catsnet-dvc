@@ -1,5 +1,7 @@
 [core]
     remote = mygdrive
+[hydra]
+    enabled = False
 ['remote "myremote"']
     url = /Users/sylvi/Documents/dvc_remotes/remote-catsnet/
 ['remote "mygdrive"']
