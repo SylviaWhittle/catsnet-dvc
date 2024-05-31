@@ -32,6 +32,7 @@ stages:
     - evaluate
     outs:
     - results/evaluate/
+    - results/evaluate_plots/
 metrics:
 - results/train/metrics.json
 - results/evaluate/metrics.json

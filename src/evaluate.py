@@ -8,6 +8,7 @@ import tensorflow as tf
 from loguru import logger
 from ruamel.yaml import YAML
 from dvclive import Live
+import matplotlib.pyplot as plt
 
 yaml = YAML(typ="safe")
 
@@ -72,17 +73,55 @@ def evaluate(
             pil_mask = pil_mask.resize(model_image_size)
             mask = np.array(pil_mask)
 
-            logger.info(f"Evaluate: Image shape after reshape: {image.shape}")
+            logger.info(f"Evaluate: Image shape after reshape: {image.shape} | Mask shape: {mask.shape}")
 
             # Add the batch dimension
             image = np.expand_dims(image, axis=0)
+            mask = np.expand_dims(mask, axis=0)
+            # Add channel dimension
+            image = np.expand_dims(image, axis=-1)
+            mask = np.expand_dims(mask, axis=-1)
+
+            logger.info(f"Evaluate: Image shape after adding batch dimension: {image.shape} | Mask shape: {mask.shape}")
 
             # Predict the mask
             mask_predicted = model.predict(image) > 0.5
 
+            # Remove the batch dimension but keep the channel dimension as dice iterates over channels in case
+            # of multi-class segmentation
+            image = np.squeeze(image, axis=0)
+            mask = np.squeeze(mask, axis=0)
+            mask_predicted = np.squeeze(mask_predicted, axis=0)
+
+            logger.info(
+                f"Evaluate: Post-squeeze image shapes: Image: {image.shape} | Mask: {mask.shape} | Predicted Mask: {mask_predicted.shape}"
+            )
+
             # Calculate the DICE score
             dice_score = dice(mask_predicted, mask)
             dice_multi += dice_score / len(image_indexes)
+
+            # Plot the image, mask and predicted mask and save it to the results/evaluate/image_plots directory
+            plot_save_dir = Path("results/evaluate_plots")
+            plot_save_dir.mkdir(parents=True, exist_ok=True)
+            num_channels = mask_predicted.shape[-1]
+            fig, ax = plt.subplots(num_channels, 3, figsize=(15, 5))
+            if num_channels == 1:
+                ax[0].imshow(image[:, :, 0], cmap="viridis")
+                ax[0].set_title("Image")
+                ax[1].imshow(mask[:, :, 0], cmap="binary")
+                ax[1].set_title("Ground Truth Mask")
+                ax[2].imshow(mask_predicted[:, :, 0], cmap="binary")
+                ax[2].set_title("Predicted Mask")
+            else:
+                for i in range(num_channels):
+                    ax[i, 0].imshow(image[:, :, i], cmap="viridis")
+                    ax[i, 0].set_title("Image")
+                    ax[i, 1].imshow(mask[:, :, i], cmap="binary")
+                    ax[i, 1].set_title(f"Ground Truth Mask Channel {i}")
+                    ax[i, 2].imshow(mask_predicted[:, :, i], cmap="binary")
+                    ax[i, 2].set_title(f"Predicted Mask Channel {i}")
+            plt.savefig(f"{plot_save_dir}/test_image_{index}.png")
 
         live.summary["dice_multi"] = dice_multi
 

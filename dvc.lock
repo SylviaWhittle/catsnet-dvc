@@ -82,8 +82,8 @@ stages:
       size: 23454939
     - path: src/evaluate.py
       hash: md5
-      md5: 67f3ea9acc63e897432fddf0bd2908c8
-      size: 3760
+      md5: 25a98179bf20b7d153d5b31025f8a39f
+      size: 5865
     params:
       params.yaml:
         base:
@@ -95,6 +95,11 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 5832e6c10ced2ae82e9e76cca8e123d1.dir
-      size: 40
+      md5: 96b1905ca851ac5f36b0c0679fd19630.dir
+      size: 42
       nfiles: 1
+    - path: results/evaluate_plots/
+      hash: md5
+      md5: 5ed50b6928005885d5f6fa0ae159c421.dir
+      size: 1714068
+      nfiles: 8
