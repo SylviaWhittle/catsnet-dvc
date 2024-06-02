@@ -78,6 +78,7 @@ def train_model(
     train_data_dir: Path,
     model_save_dir: Path,
     model_image_size: Tuple[int, int],
+    learning_rate: float,
     batch_size: int,
     epochs: int,
     norm_upper_bound: float,
@@ -141,7 +142,9 @@ def train_model(
 
     # Load the model
     logger.info("Training: Loading model")
-    model = unet_model(IMG_HEIGHT=model_image_size[0], IMG_WIDTH=model_image_size[1], IMG_CHANNELS=1)
+    model = unet_model(
+        IMG_HEIGHT=model_image_size[0], IMG_WIDTH=model_image_size[1], IMG_CHANNELS=1, learning_rate=learning_rate
+    )
 
     steps_per_epoch = len(train_indexes) // batch_size
     logger.info(f"Steps per epoch: {steps_per_epoch}")
@@ -210,6 +213,7 @@ if __name__ == "__main__":
         train_data_dir=train_data_dir,
         model_save_dir=model_save_dir,
         model_image_size=(base_params["model_image_size"], base_params["model_image_size"]),
+        learning_rate=train_params["learning_rate"],
         batch_size=train_params["batch_size"],
         epochs=train_params["epochs"],
         norm_upper_bound=train_params["norm_upper_bound"],

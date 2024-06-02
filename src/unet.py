@@ -1,5 +1,7 @@
 """A U-NET model for segmentation of atomic force microscopy image grains."""
 
+# import adam optimizer
+from keras.optimizers import Adam
 from keras.models import Model
 from keras.layers import (
     Input,
@@ -33,7 +35,7 @@ def iou_loss(y_true, y_pred, smooth=1e-5):
     return iou
 
 
-def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS):
+def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS, learning_rate):
     """U-NET model definition function."""
 
     inputs = Input((IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS))
@@ -100,7 +102,9 @@ def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS):
     outputs = Conv2D(1, kernel_size=(1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+    # custom learning rate
+    optimizer = Adam(learning_rate)
+    model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"])
     model.summary()
 
     return model
