@@ -10,8 +10,8 @@ train:
   train_data_dir: data/train/
   model_save_dir: models/
   batch_size: 5
-  epochs: 50
-  activation_function: relu
+  epochs: 5
+  activation_function: sigmoid
   learning_rate: 0.0001
   norm_upper_bound: 7
   norm_lower_bound: -1

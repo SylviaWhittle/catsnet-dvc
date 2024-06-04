@@ -18,33 +18,33 @@ stages:
           random_seed: 0
           model_image_size: 256
         data_split:
-          test_split: 0.1
+          test_split: 0.2
           data_dir: data/all_data/
           train_data_dir: data/train/
           test_data_dir: data/test/
     outs:
     - path: data/test
       hash: md5
-      md5: fbda72b076bb16a356fc4e587f0d16f8.dir
-      size: 13189121
-      nfiles: 32
+      md5: e8766d24ccc24dcc2c3d7c2411524b01.dir
+      size: 28969711
+      nfiles: 64
     - path: data/train
       hash: md5
-      md5: 014bfac42b32eee9e2669ceca8482b8b.dir
-      size: 144704046
-      nfiles: 284
+      md5: b863265b49281c883ce49f3d3365369a.dir
+      size: 128923456
+      nfiles: 252
   train:
     cmd: python src/train.py
     deps:
     - path: data/train/
       hash: md5
-      md5: 014bfac42b32eee9e2669ceca8482b8b.dir
-      size: 144704046
-      nfiles: 284
+      md5: b863265b49281c883ce49f3d3365369a.dir
+      size: 128923456
+      nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: 303bc875a0506c582c98775ebad636c4
-      size: 7798
+      md5: e33e12d02baa85f3e9f9919bc2efa2c5
+      size: 8209
     params:
       params.yaml:
         base:
@@ -53,33 +53,35 @@ stages:
         train:
           train_data_dir: data/train/
           model_save_dir: models/
-          batch_size: 2
-          epochs: 50
+          batch_size: 5
+          epochs: 5
+          activation_function: sigmoid
+          learning_rate: 0.0001
           norm_upper_bound: 7
           norm_lower_bound: -1
           validation_split: 0.2
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 343a08cec07288294b247e83355a616f
-      size: 23454939
+      md5: 36e676188d71b155f0db7c5bf08a9464
+      size: 23455421
     - path: results/train/
       hash: md5
-      md5: 828dbc21d8b42f881955251ca233b4b0.dir
-      size: 4736
+      md5: 04a84f286738dfff0049d8ac7b4dbb43.dir
+      size: 678
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
     deps:
     - path: data/test/
       hash: md5
-      md5: fbda72b076bb16a356fc4e587f0d16f8.dir
-      size: 13189121
-      nfiles: 32
+      md5: e8766d24ccc24dcc2c3d7c2411524b01.dir
+      size: 28969711
+      nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 343a08cec07288294b247e83355a616f
-      size: 23454939
+      md5: 36e676188d71b155f0db7c5bf08a9464
+      size: 23455421
     - path: src/evaluate.py
       hash: md5
       md5: 925f98789798e9920bf396e614d4b29b
@@ -95,6 +97,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 42e330087e2dd0b2297e3df41be8d2c2.dir
-      size: 1700653
-      nfiles: 9
+      md5: 808749d6794fb63a556b938ca2572a73.dir
+      size: 3182997
+      nfiles: 17
