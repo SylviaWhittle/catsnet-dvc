@@ -10,6 +10,8 @@ from ruamel.yaml import YAML
 from dvclive import Live
 import matplotlib.pyplot as plt
 
+from unet import dice_loss, iou_loss
+
 yaml = YAML(typ="safe")
 
 
@@ -138,9 +140,19 @@ if __name__ == "__main__":
     model_path = Path(evaluate_params["model_path"])
     data_dir = Path(evaluate_params["test_data_dir"])
 
+    # Get the right loss function and pass to custom objects
+    custom_objects = {}
+    loss_function = base_params["loss_function"]
+    if loss_function == "dice_loss":
+        custom_objects["dice_loss"] = dice_loss
+    elif loss_function == "iou_loss":
+        custom_objects["iou_loss"] = iou_loss
+    else:
+        raise ValueError(f"Invalid loss function: {loss_function}")
+
     # Load the model
     logger.info("Evaluate: Loading the model.")
-    model = tf.keras.models.load_model(model_path)
+    model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
 
     # Evaluate the model
     logger.info("Evaluate: Evaluating the model.")

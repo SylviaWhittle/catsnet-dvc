@@ -85,6 +85,7 @@ def train_model(
     norm_upper_bound: float,
     norm_lower_bound: int,
     validation_split: float,
+    loss_function: str,
 ):
     """Train a model to segment images."""
 
@@ -102,6 +103,7 @@ def train_model(
     logger.info(f"|  Normalisation upper bound: {norm_upper_bound}")
     logger.info(f"|  Normalisation lower bound: {norm_lower_bound}")
     logger.info(f"|  Test size: {validation_split}")
+    logger.info(f"|  Loss function: {loss_function}")
 
     # Set the random seed
     np.random.seed(random_seed)
@@ -151,6 +153,7 @@ def train_model(
         IMG_CHANNELS=1,
         learning_rate=learning_rate,
         activation_function=activation_function,
+        loss_function=loss_function,
     )
 
     steps_per_epoch = len(train_indexes) // batch_size
@@ -227,4 +230,5 @@ if __name__ == "__main__":
         norm_upper_bound=train_params["norm_upper_bound"],
         norm_lower_bound=train_params["norm_lower_bound"],
         validation_split=train_params["validation_split"],
+        loss_function=base_params["loss_function"],
     )

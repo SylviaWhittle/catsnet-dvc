@@ -28,6 +28,7 @@ stages:
     - data/test/
     - models/catsnet_model.keras
     - src/evaluate.py
+    - src/unet.py
     params:
     - base
     - evaluate

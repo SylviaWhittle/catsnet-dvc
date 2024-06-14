@@ -17,6 +17,7 @@ stages:
         base:
           random_seed: 0
           model_image_size: 256
+          loss_function: iou_loss
         data_split:
           test_split: 0.2
           data_dir: data/all_data/
@@ -43,13 +44,18 @@ stages:
       nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: e33e12d02baa85f3e9f9919bc2efa2c5
-      size: 8209
+      md5: 1ebaa8f71da82bc67cdd52dab1680b73
+      size: 8376
+    - path: src/unet.py
+      hash: md5
+      md5: 1f9fb5155f1dfde0bc61a7aabc8e3e3f
+      size: 6864
     params:
       params.yaml:
         base:
           random_seed: 0
           model_image_size: 256
+          loss_function: iou_loss
         train:
           train_data_dir: data/train/
           model_save_dir: models/
@@ -63,11 +69,11 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 36e676188d71b155f0db7c5bf08a9464
-      size: 23455421
+      md5: 5eb2e3bbbe773dc2aaaa1b4e7ce678c3
+      size: 23455501
     - path: results/train/
       hash: md5
-      md5: 04a84f286738dfff0049d8ac7b4dbb43.dir
+      md5: 27b2a0a061ed8f2b0f35714ad91e25f7.dir
       size: 678
       nfiles: 5
   evaluate:
@@ -80,17 +86,22 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 36e676188d71b155f0db7c5bf08a9464
-      size: 23455421
+      md5: 5eb2e3bbbe773dc2aaaa1b4e7ce678c3
+      size: 23455501
     - path: src/evaluate.py
       hash: md5
-      md5: 925f98789798e9920bf396e614d4b29b
-      size: 5764
+      md5: 2569536eb4e03562b5f48875b6b881df
+      size: 6215
+    - path: src/unet.py
+      hash: md5
+      md5: 1f9fb5155f1dfde0bc61a7aabc8e3e3f
+      size: 6864
     params:
       params.yaml:
         base:
           random_seed: 0
           model_image_size: 256
+          loss_function: iou_loss
         evaluate:
           model_path: models/catsnet_model.keras
           test_data_dir: data/test/

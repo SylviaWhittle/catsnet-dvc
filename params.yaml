@@ -1,6 +1,8 @@
 base:
   random_seed: 0
   model_image_size: 256
+  # Loss needs to be here since both train and evaluate need it
+  loss_function: iou_loss # Options: binary_crossentropy, iou_loss, dice_loss
 data_split:
   test_split: 0.2
   data_dir: data/all_data/
