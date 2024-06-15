@@ -147,6 +147,8 @@ if __name__ == "__main__":
         custom_objects["dice_loss"] = dice_loss
     elif loss_function == "iou_loss":
         custom_objects["iou_loss"] = iou_loss
+    elif loss_function == "binary_crossentropy":
+        pass
     else:
         raise ValueError(f"Invalid loss function: {loss_function}")
 
