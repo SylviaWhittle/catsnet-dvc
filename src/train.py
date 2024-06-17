@@ -148,9 +148,9 @@ def train_model(
     # Load the model
     logger.info("Training: Loading model")
     model = unet_model(
-        IMG_HEIGHT=model_image_size[0],
-        IMG_WIDTH=model_image_size[1],
-        IMG_CHANNELS=1,
+        image_height=model_image_size[0],
+        image_width=model_image_size[1],
+        image_channels=1,
         learning_rate=learning_rate,
         activation_function=activation_function,
         loss_function=loss_function,

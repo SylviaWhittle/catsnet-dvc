@@ -19,6 +19,22 @@ import tensorflow as tf
 
 # DICE Loss
 def dice_loss(y_true, y_pred, smooth=1e-5):
+    """DICE loss function.
+
+    Parameters
+    ----------
+    y_true : tf.Tensor
+        True values.
+    y_pred : tf.Tensor
+        Predicted values.
+    smooth : float
+        Smoothing factor to prevent division by zero.
+
+    Returns
+    -------
+    dice : tf.Tensor
+        The DICE loss.
+    """
     intersection = tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     sum_of_squares_pred = tf.reduce_sum(tf.square(y_pred), axis=(1, 2))
     sum_of_squares_true = tf.reduce_sum(tf.square(y_true), axis=(1, 2))
@@ -28,6 +44,22 @@ def dice_loss(y_true, y_pred, smooth=1e-5):
 
 # IoU Loss
 def iou_loss(y_true, y_pred, smooth=1e-5):
+    """Intersection over Union loss function.
+
+    Parameters
+    ----------
+    y_true : tf.Tensor
+        True values.
+    y_pred : tf.Tensor
+        Predicted values.
+    smooth : float
+        Smoothing factor to prevent division by zero.
+
+    Returns
+    -------
+    iou : tf.Tensor
+        The IoU loss.
+    """
     # Ensure the tensors are of the same shape
     y_true = tf.squeeze(y_true, axis=-1) if y_true.shape[-1] == 1 else y_true
     y_pred = tf.squeeze(y_pred, axis=-1) if y_pred.shape[-1] == 1 else y_pred
@@ -41,7 +73,7 @@ def iou_loss(y_true, y_pred, smooth=1e-5):
     return iou
 
 
-def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS, learning_rate, activation_function, loss_function):
+def unet_model(image_height, image_width, image_channels, learning_rate, activation_function, loss_function):
     """U-NET model definition function.
 
     Parameters
@@ -56,6 +88,8 @@ def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS, learning_rate, activation_fu
         Learning rate for the Adam optimizer.
     activation_function : str
         Activation function to use in the model.
+    loss_function : str
+        Loss function to use in the model.
 
     Returns
     -------
@@ -63,7 +97,7 @@ def unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS, learning_rate, activation_fu
         Single channel U-NET model for segmentation.
     """
 
-    inputs = Input((IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS))
+    inputs = Input((image_height, image_width, image_channels))
 
     # Downsampling
     # Downsample with increasing numbers of filters to try to capture more complex features (first argument)
