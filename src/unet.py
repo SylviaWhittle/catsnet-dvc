@@ -35,6 +35,10 @@ def dice_loss(y_true, y_pred, smooth=1e-5):
     dice : tf.Tensor
         The DICE loss.
     """
+    # Ensure floats not bool
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+
     intersection = tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     sum_of_squares_pred = tf.reduce_sum(tf.square(y_pred), axis=(1, 2))
     sum_of_squares_true = tf.reduce_sum(tf.square(y_true), axis=(1, 2))
@@ -71,6 +75,35 @@ def iou_loss(y_true, y_pred, smooth=1e-5):
     sum_of_squares_true = tf.reduce_sum(tf.square(y_true), axis=(1, 2))
     iou = 1 - (intersection + smooth) / (sum_of_squares_pred + sum_of_squares_true - intersection + smooth)
     return iou
+
+
+# BCE loss
+def bce_loss(y_true, y_pred, epsilon=1e-7):
+    """Manual binary crossentropy loss function.
+
+    Parameters
+    ----------
+    y_true : tf.Tensor
+        True values.
+    y_pred : tf.Tensor
+        Predicted values.
+    epsilon : float
+        Smoothing factor to prevent division by zero.
+
+    Returns
+    -------
+    bce : tf.Tensor
+        The binary crossentropy loss.
+    """
+    # Ensure the tensors are of the same shape
+    y_true = tf.squeeze(y_true, axis=-1) if y_true.shape[-1] == 1 else y_true
+    y_pred = tf.squeeze(y_pred, axis=-1) if y_pred.shape[-1] == 1 else y_pred
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+
+    y_pred = tf.clip_by_value(y_pred, epsilon, 1.0 - epsilon)  # To ensure no log(0) occurs
+    bce = -tf.reduce_mean(y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(1 - y_pred))
+    return bce
 
 
 def unet_model(image_height, image_width, image_channels, learning_rate, activation_function, loss_function):
@@ -197,6 +230,7 @@ def unet_model(image_height, image_width, image_channels, learning_rate, activat
     outputs = Conv2D(1, kernel_size=(1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=[inputs], outputs=[outputs])
+    print(type(model))
     # custom learning rate
     optimizer = Adam(learning_rate)
 
