@@ -44,12 +44,12 @@ stages:
       nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: 1ebaa8f71da82bc67cdd52dab1680b73
-      size: 8376
+      md5: 0dc77a4becf1515dd9a12116f75074f3
+      size: 8382
     - path: src/unet.py
       hash: md5
-      md5: 1f9fb5155f1dfde0bc61a7aabc8e3e3f
-      size: 6864
+      md5: e31093c417c1a2bf150ce9b9127cd3fd
+      size: 8582
     params:
       params.yaml:
         base:
@@ -60,8 +60,8 @@ stages:
           train_data_dir: data/train/
           model_save_dir: models/
           batch_size: 5
-          epochs: 5
-          activation_function: sigmoid
+          epochs: 6
+          activation_function: relu
           learning_rate: 0.0001
           norm_upper_bound: 7
           norm_lower_bound: -1
@@ -69,12 +69,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 5eb2e3bbbe773dc2aaaa1b4e7ce678c3
-      size: 23455501
+      md5: 124dfc06d5b7447155a7fbbcbf94fbbe
+      size: 23460493
     - path: results/train/
       hash: md5
-      md5: 27b2a0a061ed8f2b0f35714ad91e25f7.dir
-      size: 678
+      md5: 9f1ea3178f19fa08874c9f575e2ef62e.dir
+      size: 762
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -86,16 +86,16 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 5eb2e3bbbe773dc2aaaa1b4e7ce678c3
-      size: 23455501
+      md5: 124dfc06d5b7447155a7fbbcbf94fbbe
+      size: 23460493
     - path: src/evaluate.py
       hash: md5
-      md5: 2569536eb4e03562b5f48875b6b881df
-      size: 6215
+      md5: 08b9faf2aa96db1d77a76e40dddf8e82
+      size: 6277
     - path: src/unet.py
       hash: md5
-      md5: 1f9fb5155f1dfde0bc61a7aabc8e3e3f
-      size: 6864
+      md5: e31093c417c1a2bf150ce9b9127cd3fd
+      size: 8582
     params:
       params.yaml:
         base:
@@ -108,6 +108,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 808749d6794fb63a556b938ca2572a73.dir
-      size: 3182997
+      md5: 24906776851a4379d8fe047ceaa3cc16.dir
+      size: 4251479
       nfiles: 17
