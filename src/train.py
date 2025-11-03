@@ -7,8 +7,10 @@ import re
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 from dvclive import Live
 from dvclive.keras import DVCLiveCallback
 from ruamel.yaml import YAML
