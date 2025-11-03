@@ -19,6 +19,21 @@ from unet import unet_model
 
 yaml = YAML(typ="safe")
 
+def apply_hessian_filter(
+    image: npt.NDArray[np.float64],
+    hessian_high_low: str,
+    sigma: int = 1
+) -> npt.NDArray[np.float64]:
+    """Apply a Hessian filter to the image"""
+    hessian_matrix_image = hessian_matrix(image, sigma=sigma, order="rc", use_gaussian_derivatives=False)
+    hessian_maximas, hessian_minimas = hessian_matrix_eigvals(hessian_matrix_image)
+    if hessian_high_low == "high":
+        return hessian_minimas
+    elif hessian_high_low == "low":
+        return hessian_maximas
+    else:
+        raise ValueError(f"Invalid hessian_high_low value: {hessian_high_low}. Must be 'high' or 'low'.")
+
 
 # generator for data
 def image_data_generator(
@@ -28,6 +43,9 @@ def image_data_generator(
     model_image_size: Tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
+    apply_hessian: bool = False,
+    hessian_high_low: str = "high",
+    hessian_sigma: int = 1,
 ):
     """Generate batches of images and ground truth masks."""
 
@@ -45,19 +63,22 @@ def image_data_generator(
 
             # TODO: Augment the images: Scale and translate
 
-            # Resize without interpolation
-            pil_image = Image.fromarray(image)
-            pil_image = pil_image.resize(model_image_size, resample=Image.NEAREST)
-            image = np.array(pil_image)
-
-            pil_ground_truth = Image.fromarray(ground_truth)
-            pil_ground_truth = pil_ground_truth.resize(model_image_size, resample=Image.NEAREST)
-            ground_truth = np.array(pil_ground_truth)
-
             # Normalise the image
             image = np.clip(image, norm_lower_bound, norm_upper_bound)
             image = image - norm_lower_bound
             image = image / (norm_upper_bound - norm_lower_bound)
+
+            # Optionally apply hessian filter
+            if apply_hessian:
+                image = apply_hessian_filter(image, hessian_high_low=hessian_high_low, sigma=hessian_sigma)
+
+            # Resize image and mask without interpolation
+            pil_image = Image.fromarray(image)
+            pil_image = pil_image.resize(model_image_size, resample=Image.NEAREST)
+            image = np.array(pil_image)
+            pil_ground_truth = Image.fromarray(ground_truth)
+            pil_ground_truth = pil_ground_truth.resize(model_image_size, resample=Image.NEAREST)
+            ground_truth = np.array(pil_ground_truth)
 
             # TODO: Augment images: Flipping and rotate
 
@@ -86,6 +107,9 @@ def train_model(
     epochs: int,
     norm_upper_bound: float,
     norm_lower_bound: int,
+    apply_hessian: bool,
+    hessian_high_low: str,
+    hessian_sigma: int,
     validation_split: float,
     loss_function: str,
 ):
@@ -145,6 +169,9 @@ def train_model(
         model_image_size=model_image_size,
         norm_upper_bound=norm_upper_bound,
         norm_lower_bound=norm_lower_bound,
+        apply_hessian=apply_hessian,
+        hessian_high_low=hessian_high_low,
+        hessian_sigma=hessian_sigma,
     )
 
     # Load the model
@@ -231,6 +258,9 @@ if __name__ == "__main__":
         epochs=train_params["epochs"],
         norm_upper_bound=train_params["norm_upper_bound"],
         norm_lower_bound=train_params["norm_lower_bound"],
+        apply_hessian=train_params["apply_hessian"],
+        hessian_high_low=train_params["hessian_high_low"],
+        hessian_sigma=train_params["hessian_sigma"],
         validation_split=train_params["validation_split"],
         loss_function=base_params["loss_function"],
     )
