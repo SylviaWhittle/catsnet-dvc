@@ -11,6 +11,7 @@ from dvclive import Live
 import matplotlib.pyplot as plt
 
 from unet import dice_loss, iou_loss
+from preprocess import preprocess_image, preprocess_mask
 
 yaml = YAML(typ="safe")
 
@@ -35,6 +36,11 @@ def evaluate(
     model: tf.keras.Model,
     data_dir: Path,
     model_image_size: Tuple[int, int],
+    norm_upper_bound: float,
+    norm_lower_bound: float,
+    apply_hessian: bool,
+    hessian_component: str,
+    hessian_sigma: int,
 ):
     """Evaluate the model on the test set.
 
@@ -67,13 +73,21 @@ def evaluate(
             logger.info(f"Evaluate: Image index: {index}")
             logger.info(f"Evaluate: Image shape before reshape: {image.shape}")
 
-            # Resize the image and mask to the model image size
-            pil_image = Image.fromarray(image)
-            pil_image = pil_image.resize(model_image_size)
-            image = np.array(pil_image)
-            pil_mask = Image.fromarray(mask)
-            pil_mask = pil_mask.resize(model_image_size)
-            mask = np.array(pil_mask)
+            # Preprocess the image and mask
+            image = preprocess_image(
+                image=image,
+                model_image_size=model_image_size,
+                norm_upper_bound=norm_upper_bound,
+                norm_lower_bound=norm_lower_bound,
+                apply_hessian=apply_hessian,
+                hessian_component=hessian_component,
+                hessian_sigma=hessian_sigma,
+            )
+
+            mask = preprocess_mask(
+                mask=mask,
+                model_image_size=model_image_size,
+            )
 
             logger.info(f"Evaluate: Image shape after reshape: {image.shape} | Mask shape: {mask.shape}")
 
@@ -162,4 +176,9 @@ if __name__ == "__main__":
         model=model,
         data_dir=data_dir,
         model_image_size=(base_params["model_image_size"], base_params["model_image_size"]),
+        norm_upper_bound=base_params["norm_upper_bound"],
+        norm_lower_bound=base_params["norm_lower_bound"],
+        apply_hessian=base_params["apply_hessian"],
+        hessian_component=base_params["hessian_component"],
+        hessian_sigma=base_params["hessian_sigma"],
     )

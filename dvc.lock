@@ -18,6 +18,11 @@ stages:
           random_seed: 0
           model_image_size: 256
           loss_function: iou_loss
+          norm_upper_bound: 7
+          norm_lower_bound: -1
+          apply_hessian: true
+          hessian_component: maxima
+          hessian_sigma: 4
         data_split:
           test_split: 0.2
           data_dir: data/all_data/
@@ -44,8 +49,8 @@ stages:
       nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: c776b36c4480268bdca225f14a9d8de3
-      size: 9754
+      md5: 639fb28cd46ad1738802346131f57857
+      size: 8871
     - path: src/unet.py
       hash: md5
       md5: e31093c417c1a2bf150ce9b9127cd3fd
@@ -56,6 +61,11 @@ stages:
           random_seed: 0
           model_image_size: 256
           loss_function: iou_loss
+          norm_upper_bound: 7
+          norm_lower_bound: -1
+          apply_hessian: true
+          hessian_component: maxima
+          hessian_sigma: 4
         train:
           train_data_dir: data/train/
           model_save_dir: models/
@@ -63,21 +73,16 @@ stages:
           epochs: 6
           activation_function: relu
           learning_rate: 0.0001
-          norm_upper_bound: 7
-          norm_lower_bound: -1
-          apply_hessian: true
-          hessian_high_low: high
-          hessian_sigma: 1
           validation_split: 0.2
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 447aa04a3cdf3d224344325aeece6714
+      md5: 7a0285d7f39b442a88990375d1170cbe
       size: 23460493
     - path: results/train/
       hash: md5
-      md5: 7cc908f1a285215b22f12b86acc72bd5.dir
-      size: 758
+      md5: 2ac3d605ea9c722f841a5db477f07ab2.dir
+      size: 765
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -89,12 +94,12 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 447aa04a3cdf3d224344325aeece6714
+      md5: 7a0285d7f39b442a88990375d1170cbe
       size: 23460493
     - path: src/evaluate.py
       hash: md5
-      md5: 08b9faf2aa96db1d77a76e40dddf8e82
-      size: 6277
+      md5: 716e6c08133a78d20961c396c147e715
+      size: 6949
     - path: src/unet.py
       hash: md5
       md5: e31093c417c1a2bf150ce9b9127cd3fd
@@ -105,12 +110,17 @@ stages:
           random_seed: 0
           model_image_size: 256
           loss_function: iou_loss
+          norm_upper_bound: 7
+          norm_lower_bound: -1
+          apply_hessian: true
+          hessian_component: maxima
+          hessian_sigma: 4
         evaluate:
           model_path: models/catsnet_model.keras
           test_data_dir: data/test/
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: c86d5c260050890459bd3e156a69ab2e.dir
-      size: 3550587
+      md5: 6666097856c227559922199e651cc1f1.dir
+      size: 2557760
       nfiles: 17

@@ -3,6 +3,11 @@ base:
   model_image_size: 256
   # Loss needs to be here since both train and evaluate need it
   loss_function: iou_loss # Options: binary_crossentropy, iou_loss, dice_loss
+  norm_upper_bound: 7
+  norm_lower_bound: -1
+  apply_hessian: true
+  hessian_component: maxima # Options: maxima, minima
+  hessian_sigma: 4
 data_split:
   test_split: 0.2
   data_dir: data/all_data/
@@ -15,11 +20,6 @@ train:
   epochs: 6
   activation_function: relu
   learning_rate: 0.0001
-  norm_upper_bound: 7
-  norm_lower_bound: -1
-  apply_hessian: true
-  hessian_high_low: high
-  hessian_sigma: 1
   validation_split: 0.2
 evaluate:
   model_path: models/catsnet_model.keras
