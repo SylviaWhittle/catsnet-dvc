@@ -78,6 +78,11 @@ def image_data_generator(
 
         yield (batch_x, batch_y)
 
+def _extract_index(file_path):
+    match = re.search(r"\d+", file_path.name)
+    if match is None:
+        raise ValueError(f"Could not extract index from filename: {file_path.name}")
+    return int(match.group())
 
 def train_model(
     random_seed: int,
@@ -120,8 +125,8 @@ def train_model(
 
     logger.info("Training: Loading data")
     # Find the indexes of all the image files in the format of image_<index>.npy
-    image_indexes = [int(re.search(r"\d+", file.name).group()) for file in train_data_dir.glob("image_*.npy")]
-    mask_indexes = [int(re.search(r"\d+", file.name).group()) for file in train_data_dir.glob("mask_*.npy")]
+    image_indexes = [_extract_index(file) for file in train_data_dir.glob("image_*.npy")]
+    mask_indexes = [_extract_index(file) for file in train_data_dir.glob("mask_*.npy")]
 
     # Check that the image and mask indexes are the same
     if set(image_indexes) != set(mask_indexes):
