@@ -1,0 +1,5 @@
+[FORMAT]
+max-line-length=120
+max-args=10
+max-locals=20
+max-positional-arguments=10

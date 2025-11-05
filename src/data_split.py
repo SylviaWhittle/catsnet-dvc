@@ -1,3 +1,5 @@
+"""Scripts for splitting the data into training and test sets."""
+
 from pathlib import Path
 import shutil
 import re
@@ -16,6 +18,7 @@ def data_split(
     train_data_dir,
     test_data_dir,
 ):
+    """Split the data into training and test sets."""
 
     # Create the directories if they don't exist
     train_data_dir.mkdir(parents=True, exist_ok=True)
@@ -61,22 +64,22 @@ def data_split(
 if __name__ == "__main__":
     logger.info("Data split: Loading parameters from params.yaml config file.")
     # Get the parameters from the params.yaml config file
-    with open(Path("./params.yaml"), "r") as file:
+    with open(Path("./params.yaml"), "r", encoding="utf-8") as file:
         all_params = yaml.load(file)
         base_params = all_params["base"]
         data_split_params = all_params["data_split"]
 
     logger.info("Data split: Converting the paths to Path objects.")
     # Convert the paths to Path objects
-    data_dir = Path(data_split_params["data_dir"])
-    train_data_dir = Path(data_split_params["train_data_dir"])
-    test_data_dir = Path(data_split_params["test_data_dir"])
+    data_path = Path(data_split_params["data_dir"])
+    train_data_path = Path(data_split_params["train_data_dir"])
+    test_data_path = Path(data_split_params["test_data_dir"])
 
     # Split the data
     data_split(
         random_seed=base_params["random_seed"],
         test_split=data_split_params["test_split"],
-        data_dir=data_dir,
-        train_data_dir=train_data_dir,
-        test_data_dir=test_data_dir,
+        data_dir=data_path,
+        train_data_dir=train_data_path,
+        test_data_dir=test_data_path,
     )

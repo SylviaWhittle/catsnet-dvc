@@ -3,6 +3,7 @@
 from PIL import Image
 import numpy as np
 import numpy.typing as npt
+# pylint: disable=no-name-in-module
 from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 
 def resize_image(
@@ -66,10 +67,10 @@ def preprocess_image(
     # Optionally apply hessian filter
     if apply_hessian:
         image = apply_hessian_filter(image, hessian_component=hessian_component, sigma=hessian_sigma)
-    
+
     # Resize the image
     image = resize_image(image, size=model_image_size)
-    
+
     return image
 
 def preprocess_mask(
@@ -79,4 +80,3 @@ def preprocess_mask(
     """Preprocess a mask"""
     mask = resize_mask(mask, model_image_size)
     return mask
-    

@@ -1,11 +1,10 @@
-from pathlib import Path
-from typing import Tuple
-from PIL import Image
-from loguru import logger
-from datetime import datetime
-import re
+"""Scripts for training the model."""
 
-import matplotlib.pyplot as plt
+import re
+from pathlib import Path
+
+from loguru import logger
+
 import numpy as np
 import numpy.typing as npt
 import tensorflow as tf
@@ -19,13 +18,11 @@ from preprocess import preprocess_image, preprocess_mask
 
 yaml = YAML(typ="safe")
 
-
-# generator for data
 def image_data_generator(
     data_dir: Path,
-    image_indexes: np.ndarray,
+    image_indexes: npt.NDArray[np.int64],
     batch_size: int,
-    model_image_size: Tuple[int, int],
+    model_image_size: tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
     apply_hessian: bool = False,
@@ -88,7 +85,7 @@ def train_model(
     random_seed: int,
     train_data_dir: Path,
     model_save_dir: Path,
-    model_image_size: Tuple[int, int],
+    model_image_size: tuple[int, int],
     activation_function: str,
     learning_rate: float,
     batch_size: int,
@@ -181,7 +178,7 @@ def train_model(
     with Live("results/train") as live:
 
         logger.info("Training the model.")
-        history = model.fit(
+        _history = model.fit(
             train_generator,
             steps_per_epoch=steps_per_epoch,
             epochs=epochs,
@@ -224,21 +221,21 @@ def train_model(
 if __name__ == "__main__":
     logger.info("Train: Loading the parameters from the params.yaml config file.")
     # Get the parameters from the params.yaml config file
-    with open(Path("./params.yaml"), "r") as file:
+    with open(Path("./params.yaml"), "r", encoding="utf-8") as file:
         all_params = yaml.load(file)
         base_params = all_params["base"]
         train_params = all_params["train"]
 
     logger.info("Train: Converting the paths to Path objects.")
     # Convert the paths to Path objects
-    train_data_dir = Path(train_params["train_data_dir"])
-    model_save_dir = Path(train_params["model_save_dir"])
+    train_data_path = Path(train_params["train_data_dir"])
+    model_save_path = Path(train_params["model_save_dir"])
 
     # Train the model
     train_model(
         random_seed=base_params["random_seed"],
-        train_data_dir=train_data_dir,
-        model_save_dir=model_save_dir,
+        train_data_dir=train_data_path,
+        model_save_dir=model_save_path,
         model_image_size=(base_params["model_image_size"], base_params["model_image_size"]),
         activation_function=train_params["activation_function"],
         learning_rate=train_params["learning_rate"],

@@ -1,6 +1,7 @@
+# pylint: disable=import-error
+# pylint: disable=unused-import
 """A U-NET model for segmentation of atomic force microscopy image grains."""
 
-# import adam optimizer
 from keras.optimizers import Adam
 from keras.models import Model
 from keras.layers import (
@@ -16,8 +17,6 @@ from keras.layers import (
 )
 import tensorflow as tf
 
-
-# DICE Loss
 def dice_loss(y_true, y_pred, smooth=1e-5):
     """DICE loss function.
 
