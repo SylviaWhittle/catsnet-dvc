@@ -20,7 +20,7 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: true
+          apply_hessian: false
           hessian_component: minima
           hessian_sigma: 4
         data_split:
@@ -63,7 +63,7 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: true
+          apply_hessian: false
           hessian_component: minima
           hessian_sigma: 4
         train:
@@ -77,12 +77,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 22122aab7626e6e5cedef62f95ea8490
+      md5: 2795918b2822bc0210d1d456b53c75bb
       size: 23460493
     - path: results/train/
       hash: md5
-      md5: 1b3443f94a0a6b37f8a03a1a822356cd.dir
-      size: 4620
+      md5: b3e87dbdd699e34df7f8bcb0c8d0dca9.dir
+      size: 4633
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -94,7 +94,7 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 22122aab7626e6e5cedef62f95ea8490
+      md5: 2795918b2822bc0210d1d456b53c75bb
       size: 23460493
     - path: src/evaluate.py
       hash: md5
@@ -112,7 +112,7 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: true
+          apply_hessian: false
           hessian_component: minima
           hessian_sigma: 4
         evaluate:
@@ -121,6 +121,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 235eae0d458c05efe75fa0418e4ed314.dir
-      size: 2394588
+      md5: bd1be088ffc644e2dd8d0f05088bb98b.dir
+      size: 2688223
       nfiles: 17
