@@ -1,9 +1,11 @@
+"""Evaluate the trained model on the test set."""
+
 from pathlib import Path
 import re
-from PIL import Image
 from typing import Tuple
 
 import numpy as np
+import numpy.typing as npt
 import tensorflow as tf
 from loguru import logger
 from ruamel.yaml import YAML
@@ -101,13 +103,15 @@ def evaluate(
             logger.info(f"Evaluate: Image shape after adding batch dimension: {image.shape} | Mask shape: {mask.shape}")
 
             # Predict the mask
-            mask_predicted = model.predict(image) > 0.5
+            mask_predicted = model.predict(image)
 
             # Remove the batch dimension but keep the channel dimension as dice iterates over channels in case
             # of multi-class segmentation
             image = np.squeeze(image, axis=0)
             mask = np.squeeze(mask, axis=0)
             mask_predicted = np.squeeze(mask_predicted, axis=0)
+
+            mask_predicted_binary = (mask_predicted >= 0.5)
 
             logger.info(
                 f"Evaluate: Post-squeeze image shapes: Image: {image.shape} | Mask: {mask.shape} | Predicted Mask: {mask_predicted.shape}"
@@ -119,22 +123,26 @@ def evaluate(
 
             # Plot the image, mask and predicted mask and log it
             num_channels = mask_predicted.shape[-1]
-            fig, ax = plt.subplots(num_channels, 3, figsize=(15, 5))
+            fig, ax = plt.subplots(num_channels, 4, figsize=(15, 5))
             if num_channels == 1:
                 ax[0].imshow(image[:, :, 0], cmap="viridis")
                 ax[0].set_title("Image")
                 ax[1].imshow(mask[:, :, 0], cmap="binary")
                 ax[1].set_title("Ground Truth Mask")
-                ax[2].imshow(mask_predicted[:, :, 0], cmap="binary")
+                ax[2].imshow(mask_predicted[:, :, 0], cmap="gray")
                 ax[2].set_title("Predicted Mask")
+                ax[3].imshow(mask_predicted_binary[:, :, 0], cmap="binary")
+                ax[3].set_title("Predicted Mask Binary")
             else:
                 for i in range(num_channels):
                     ax[i, 0].imshow(image[:, :, i], cmap="viridis")
                     ax[i, 0].set_title("Image")
                     ax[i, 1].imshow(mask[:, :, i], cmap="binary")
                     ax[i, 1].set_title(f"Ground Truth Mask Channel {i}")
-                    ax[i, 2].imshow(mask_predicted[:, :, i], cmap="binary")
+                    ax[i, 2].imshow(mask_predicted[:, :, i], cmap="gray")
                     ax[i, 2].set_title(f"Predicted Mask Channel {i}")
+                    ax[i, 3].imshow(mask_predicted_binary[:, :, i], cmap="binary")
+                    ax[i, 3].set_title(f"Predicted Mask Binary Channel {i} Binary")
             # plt.savefig(f"{plot_save_dir}/test_image_{index}.png")
             live.log_image(f"test_image_plot_{index}.png", fig)
 
