@@ -70,19 +70,19 @@ stages:
           train_data_dir: data/train/
           model_save_dir: models/
           batch_size: 5
-          epochs: 6
+          epochs: 50
           activation_function: relu
           learning_rate: 0.0001
           validation_split: 0.2
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 4909da836adac5d39b2dcdf9298df225
+      md5: f78d8a8612bee46c69cc6562990f8562
       size: 23460493
     - path: results/train/
       hash: md5
-      md5: 775cb60c2848aa1a492e922f03804bfd.dir
-      size: 758
+      md5: c75715ac052efa759533fc0ca824f070.dir
+      size: 4606
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -94,7 +94,7 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 4909da836adac5d39b2dcdf9298df225
+      md5: f78d8a8612bee46c69cc6562990f8562
       size: 23460493
     - path: src/evaluate.py
       hash: md5
@@ -121,6 +121,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: bd1788d674b234fdbcc1ea228e8f5734.dir
-      size: 3921419
+      md5: 111b50da1dbd67bb61c1730f0d0c1db6.dir
+      size: 2056265
       nfiles: 17

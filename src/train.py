@@ -25,9 +25,9 @@ def image_data_generator(
     model_image_size: tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
-    apply_hessian: bool = False,
-    hessian_component: str = "high",
-    hessian_sigma: int = 1,
+    apply_hessian: bool,
+    hessian_component: str,
+    hessian_sigma: int,
 ):
     """Generate batches of images and ground truth masks."""
 
@@ -145,6 +145,9 @@ def train_model(
         model_image_size=model_image_size,
         norm_upper_bound=norm_upper_bound,
         norm_lower_bound=norm_lower_bound,
+        apply_hessian=apply_hessian,
+        hessian_component=hessian_component,
+        hessian_sigma=hessian_sigma,
     )
 
     validation_generator = image_data_generator(
