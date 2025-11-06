@@ -40,7 +40,7 @@ def evaluate(
     model_image_size: Tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
-    apply_hessian: bool,
+    filter_channels: list[str],
     hessian_component: str,
     hessian_sigma: int,
 ):
@@ -81,7 +81,7 @@ def evaluate(
                 model_image_size=model_image_size,
                 norm_upper_bound=norm_upper_bound,
                 norm_lower_bound=norm_lower_bound,
-                apply_hessian=apply_hessian,
+                filter_channels=filter_channels,
                 hessian_component=hessian_component,
                 hessian_sigma=hessian_sigma,
             )
@@ -111,10 +111,11 @@ def evaluate(
             mask = np.squeeze(mask, axis=0)
             mask_predicted = np.squeeze(mask_predicted, axis=0)
 
-            mask_predicted_binary = (mask_predicted >= 0.5)
+            mask_predicted_binary = mask_predicted >= 0.5
 
             logger.info(
-                f"Evaluate: Post-squeeze image shapes: Image: {image.shape} | Mask: {mask.shape} | Predicted Mask: {mask_predicted.shape}"
+                f"Evaluate: Post-squeeze image shapes: Image: {image.shape} | Mask: {mask.shape} |"
+                f"Predicted Mask: {mask_predicted.shape}"
             )
 
             # Calculate the DICE score
@@ -160,7 +161,7 @@ if __name__ == "__main__":
     logger.info("Evaluate: Converting the paths to Path objects.")
     # Convert the paths to Path objects
     model_path = Path(evaluate_params["model_path"])
-    data_dir = Path(evaluate_params["test_data_dir"])
+    data_path = Path(evaluate_params["test_data_dir"])
 
     # Get the right loss function and pass to custom objects
     custom_objects = {}
@@ -176,17 +177,17 @@ if __name__ == "__main__":
 
     # Load the model
     logger.info("Evaluate: Loading the model.")
-    model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
+    loaded_model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
 
     # Evaluate the model
     logger.info("Evaluate: Evaluating the model.")
     evaluate(
-        model=model,
-        data_dir=data_dir,
+        model=loaded_model,
+        data_dir=data_path,
         model_image_size=(base_params["model_image_size"], base_params["model_image_size"]),
         norm_upper_bound=base_params["norm_upper_bound"],
         norm_lower_bound=base_params["norm_lower_bound"],
-        apply_hessian=base_params["apply_hessian"],
+        filter_channels=base_params["filter_channels"],
         hessian_component=base_params["hessian_component"],
         hessian_sigma=base_params["hessian_sigma"],
     )

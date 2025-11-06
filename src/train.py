@@ -25,7 +25,7 @@ def image_data_generator(
     model_image_size: tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
-    apply_hessian: bool,
+    filter_channels: list[str],
     hessian_component: str,
     hessian_sigma: int,
 ):
@@ -49,7 +49,7 @@ def image_data_generator(
                 model_image_size=model_image_size,
                 norm_lower_bound=norm_lower_bound,
                 norm_upper_bound=norm_upper_bound,
-                apply_hessian=apply_hessian,
+                filter_channels=filter_channels,
                 hessian_component=hessian_component,
                 hessian_sigma=hessian_sigma,
             )
@@ -70,8 +70,8 @@ def image_data_generator(
         batch_x = np.array(batch_input).astype(np.float32)
         batch_y = np.array(batch_output).astype(np.float32)
 
-        # logger.info(f"Batch x shape: {batch_x.shape}")
-        # logger.info(f"Batch y shape: {batch_y.shape}")
+        logger.info(f"Batch x shape: {batch_x.shape}")
+        logger.info(f"Batch y shape: {batch_y.shape}")
 
         yield (batch_x, batch_y)
 
@@ -92,7 +92,7 @@ def train_model(
     epochs: int,
     norm_upper_bound: float,
     norm_lower_bound: int,
-    apply_hessian: bool,
+    filter_channels: list[str],
     hessian_component: str,
     hessian_sigma: int,
     validation_split: float,
@@ -145,7 +145,7 @@ def train_model(
         model_image_size=model_image_size,
         norm_upper_bound=norm_upper_bound,
         norm_lower_bound=norm_lower_bound,
-        apply_hessian=apply_hessian,
+        filter_channels=filter_channels,
         hessian_component=hessian_component,
         hessian_sigma=hessian_sigma,
     )
@@ -157,7 +157,7 @@ def train_model(
         model_image_size=model_image_size,
         norm_upper_bound=norm_upper_bound,
         norm_lower_bound=norm_lower_bound,
-        apply_hessian=apply_hessian,
+        filter_channels=filter_channels,
         hessian_component=hessian_component,
         hessian_sigma=hessian_sigma,
     )
@@ -167,7 +167,7 @@ def train_model(
     model = unet_model(
         image_height=model_image_size[0],
         image_width=model_image_size[1],
-        image_channels=1,
+        image_channels=len(filter_channels),
         learning_rate=learning_rate,
         activation_function=activation_function,
         loss_function=loss_function,
@@ -246,7 +246,7 @@ if __name__ == "__main__":
         epochs=train_params["epochs"],
         norm_upper_bound=base_params["norm_upper_bound"],
         norm_lower_bound=base_params["norm_lower_bound"],
-        apply_hessian=base_params["apply_hessian"],
+        filter_channels=base_params["filter_channels"],
         hessian_component=base_params["hessian_component"],
         hessian_sigma=base_params["hessian_sigma"],
         validation_split=train_params["validation_split"],

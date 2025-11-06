@@ -20,7 +20,8 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: false
+          filter_channels:
+          - original
           hessian_component: minima
           hessian_sigma: 4
         data_split:
@@ -49,8 +50,8 @@ stages:
       nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: 0b1089d05effd6e3a2d493071667632f
-      size: 9057
+      md5: 637c78565763535dd1fc7016e6c20eb0
+      size: 9102
     - path: src/unet.py
       hash: md5
       md5: 61803ae98395201945088de33d223d1c
@@ -63,7 +64,8 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: false
+          filter_channels:
+          - original
           hessian_component: minima
           hessian_sigma: 4
         train:
@@ -77,12 +79,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 2795918b2822bc0210d1d456b53c75bb
+      md5: d6a7e74d94f58f2fcd8a0b92d8899082
       size: 23460493
     - path: results/train/
       hash: md5
-      md5: b3e87dbdd699e34df7f8bcb0c8d0dca9.dir
-      size: 4633
+      md5: 4131be9179c0e0eabd945f3cb4994950.dir
+      size: 4634
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -94,12 +96,12 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 2795918b2822bc0210d1d456b53c75bb
+      md5: d6a7e74d94f58f2fcd8a0b92d8899082
       size: 23460493
     - path: src/evaluate.py
       hash: md5
-      md5: 69b77af41a8d4b096c506ddfaf2e0270
-      size: 7356
+      md5: b233436eeb20b8976614b3324711cd54
+      size: 7404
     - path: src/unet.py
       hash: md5
       md5: 61803ae98395201945088de33d223d1c
@@ -112,7 +114,8 @@ stages:
           loss_function: iou_loss
           norm_upper_bound: 7
           norm_lower_bound: -1
-          apply_hessian: false
+          filter_channels:
+          - original
           hessian_component: minima
           hessian_sigma: 4
         evaluate:
@@ -121,6 +124,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: bd1be088ffc644e2dd8d0f05088bb98b.dir
-      size: 2688223
+      md5: 218ad3599ceceefdebba8a63fda3069a.dir
+      size: 2712734
       nfiles: 17

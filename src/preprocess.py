@@ -56,7 +56,7 @@ def preprocess_image(
     model_image_size: tuple[int, int],
     norm_upper_bound: float,
     norm_lower_bound: float,
-    apply_hessian: bool,
+    filter_channels: list[str],
     hessian_component: str,
     hessian_sigma: int,
 ) -> npt.NDArray[np.float64]:
@@ -64,12 +64,20 @@ def preprocess_image(
     # Normalise the image
     image = normalise_image(image, norm_upper_bound, norm_lower_bound)
 
-    # Optionally apply hessian filter
-    if apply_hessian:
-        image = apply_hessian_filter(image, hessian_component=hessian_component, sigma=hessian_sigma)
+    image_channels = []
 
-    # Resize the image
-    image = resize_image(image, size=model_image_size)
+    if "original" in filter_channels:
+        image_channels.append(image)
+    if "hessian" in filter_channels:
+        image_hessian = apply_hessian_filter(image, hessian_component=hessian_component, sigma=hessian_sigma)
+        image_channels.append(image_hessian)
+
+    # Resize the images
+    for index, image_channel in enumerate(image_channels):
+        image_channels[index] = resize_image(image_channel, size=model_image_size)
+
+    # Stack the channels
+    image = np.stack(image_channels, axis=-1)
 
     return image
 
