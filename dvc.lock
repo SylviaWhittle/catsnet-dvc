@@ -21,7 +21,7 @@ stages:
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
-          - original
+          - hessian
           hessian_component: minima
           hessian_sigma: 4
         data_split:
@@ -65,7 +65,7 @@ stages:
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
-          - original
+          - hessian
           hessian_component: minima
           hessian_sigma: 4
         train:
@@ -79,12 +79,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: d6a7e74d94f58f2fcd8a0b92d8899082
+      md5: d475e069eae7fc3d80082d5310f778c5
       size: 23460493
     - path: results/train/
       hash: md5
-      md5: 4131be9179c0e0eabd945f3cb4994950.dir
-      size: 4634
+      md5: 6d78856e6dfec4a20caf657734717e35.dir
+      size: 4618
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -96,7 +96,7 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: d6a7e74d94f58f2fcd8a0b92d8899082
+      md5: d475e069eae7fc3d80082d5310f778c5
       size: 23460493
     - path: src/evaluate.py
       hash: md5
@@ -115,7 +115,7 @@ stages:
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
-          - original
+          - hessian
           hessian_component: minima
           hessian_sigma: 4
         evaluate:
@@ -124,6 +124,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 218ad3599ceceefdebba8a63fda3069a.dir
-      size: 2712734
+      md5: b06a5049554959931a0724e414401644.dir
+      size: 2394562
       nfiles: 17
