@@ -96,14 +96,13 @@ def evaluate(
             # Add the batch dimension
             image = np.expand_dims(image, axis=0)
             mask = np.expand_dims(mask, axis=0)
-            # Add channel dimension
-            image = np.expand_dims(image, axis=-1)
-            mask = np.expand_dims(mask, axis=-1)
 
             logger.info(f"Evaluate: Image shape after adding batch dimension: {image.shape} | Mask shape: {mask.shape}")
 
             # Predict the mask
             mask_predicted = model.predict(image)
+
+            logger.info(f"Evaluate: Predicted mask shape: {mask_predicted.shape}")
 
             # Remove the batch dimension but keep the channel dimension as dice iterates over channels in case
             # of multi-class segmentation
@@ -111,11 +110,13 @@ def evaluate(
             mask = np.squeeze(mask, axis=0)
             mask_predicted = np.squeeze(mask_predicted, axis=0)
 
+            # Threshold the predicted mask to get a binary mask
             mask_predicted_binary = mask_predicted >= 0.5
 
             logger.info(
                 f"Evaluate: Post-squeeze image shapes: Image: {image.shape} | Mask: {mask.shape} |"
-                f"Predicted Mask: {mask_predicted.shape}"
+                f"Predicted Mask: {mask_predicted.shape} Binary predicted mask:"
+                f"{mask_predicted_binary.shape} ground truth: {mask.shape}"
             )
 
             # Calculate the DICE score
@@ -123,32 +124,46 @@ def evaluate(
             dice_multi += dice_score / len(image_indexes)
 
             # Plot the image, mask and predicted mask and log it
-            num_channels = mask_predicted.shape[-1]
-            fig, ax = plt.subplots(num_channels, 4, figsize=(15, 5))
-            if num_channels == 1:
-                ax[0].imshow(image[:, :, 0], cmap="viridis")
-                ax[0].set_title("Image")
-                ax[1].imshow(mask[:, :, 0], cmap="binary")
-                ax[1].set_title("Ground Truth Mask")
-                ax[2].imshow(mask_predicted[:, :, 0], cmap="gray")
-                ax[2].set_title("Predicted Mask")
-                ax[3].imshow(mask_predicted_binary[:, :, 0], cmap="binary")
-                ax[3].set_title("Predicted Mask Binary")
-            else:
-                for i in range(num_channels):
-                    ax[i, 0].imshow(image[:, :, i], cmap="viridis")
-                    ax[i, 0].set_title("Image")
-                    ax[i, 1].imshow(mask[:, :, i], cmap="binary")
-                    ax[i, 1].set_title(f"Ground Truth Mask Channel {i}")
-                    ax[i, 2].imshow(mask_predicted[:, :, i], cmap="gray")
-                    ax[i, 2].set_title(f"Predicted Mask Channel {i}")
-                    ax[i, 3].imshow(mask_predicted_binary[:, :, i], cmap="binary")
-                    ax[i, 3].set_title(f"Predicted Mask Binary Channel {i} Binary")
+            # Plot the image, mask and predicted mask and log it
+            # Plot sequentially with wrapping
+            max_num_cols = 3
+            num_output_channels = mask.shape[2]
+            num_input_channels = image.shape[2]
+            # Total plots = number input channels + number of output channels + mask
+            total_plots = num_input_channels + num_output_channels + 1
+            num_rows = total_plots // max_num_cols + int(total_plots % max_num_cols > 0)
+            fig, axes = plt.subplots(num_rows, min(total_plots, max_num_cols))
+            plot_index = 0
+            logger.info(
+                f"Evaluate: Plotting {num_input_channels} input channels and {num_output_channels} output channels."
+            )
+            # Plot input channels
+            for i in range(num_input_channels):
+                ax = axes.flatten()[plot_index]
+                ax.imshow(image[:, :, i], cmap="viridis")
+                ax.set_title(f"Input C{i}")
+                plot_index += 1
+            # Plot ground truth mask channels
+            for i in range(mask.shape[2]):
+                ax = axes.flatten()[plot_index]
+                ax.imshow(mask[:, :, i], cmap="binary")
+                ax.set_title(f"GT Mask C{i}")
+                plot_index += 1
+            # Plot output channels both nonbinary and binary
+            for i in range(num_output_channels):
+                ax = axes.flatten()[plot_index]
+                ax.imshow(mask_predicted[:, :, i], cmap="gray_r")
+                ax.set_title(f"Pred Mask C{i}")
+                plot_index += 1
+                ax = axes.flatten()[plot_index]
+                ax.imshow(mask_predicted_binary[:, :, i], cmap="binary")
+                ax.set_title(f"Pred bin Mask C{i}")
+                plot_index += 1
+            plt.tight_layout()
             # plt.savefig(f"{plot_save_dir}/test_image_{index}.png")
             live.log_image(f"test_image_plot_{index}.png", fig)
 
         live.summary["dice_multi"] = dice_multi
-
 
 if __name__ == "__main__":
     logger.info("Evaluate: Loading parameters from params.yaml config file.")

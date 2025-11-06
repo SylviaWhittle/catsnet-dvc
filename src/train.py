@@ -71,8 +71,8 @@ def image_data_generator(
         batch_x = np.array(batch_input).astype(np.float32)
         batch_y = np.array(batch_output).astype(np.float32)
 
-        logger.info(f"Batch x shape: {batch_x.shape}")
-        logger.info(f"Batch y shape: {batch_y.shape}")
+        # logger.info(f"Batch x shape: {batch_x.shape}")
+        # logger.info(f"Batch y shape: {batch_y.shape}")
 
         yield (batch_x, batch_y)
 

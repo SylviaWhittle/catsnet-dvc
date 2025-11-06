@@ -15,14 +15,33 @@ def resize_image(
     pil_image = pil_image.resize(size, resample=Image.NEAREST)
     return np.array(pil_image)
 
+def resize_single_channel_mask(
+    mask: npt.NDArray[np.bool_],
+    size: tuple[int, int],
+) -> npt.NDArray[np.bool_]:
+    """Resize a single channel mask to the desired size."""
+    pil_mask = Image.fromarray(mask)
+    pil_mask = pil_mask.resize(size, resample=Image.NEAREST)
+    return np.array(pil_mask).astype(bool)
+
 def resize_mask(
     mask: npt.NDArray[np.bool_],
     size: tuple[int, int],
 ) -> npt.NDArray[np.bool_]:
     """Resize the mask to the desired size."""
-    pil_mask = Image.fromarray(mask)
-    pil_mask = pil_mask.resize(size, resample=Image.NEAREST)
-    return np.array(pil_mask).astype(bool)
+    if len(mask.shape) != 3:
+        raise ValueError(f"Mask must have 3 dimensions (H, W, C), got {mask.shape}")
+
+    # Iterate over channels and resize each channel
+    mask_channels = []
+    for i in range(mask.shape[2]):
+        mask_channel = mask[:, :, i]
+        resized_channel = resize_single_channel_mask(mask_channel, size)
+        mask_channels.append(resized_channel)
+
+    # Stack the channels back together
+    resized_mask = np.stack(mask_channels, axis=-1)
+    return resized_mask.astype(bool)
 
 def normalise_image(
     image: npt.NDArray[np.float64],
@@ -85,6 +104,9 @@ def preprocess_mask(
     mask: npt.NDArray[np.bool_],
     model_image_size: tuple[int, int],
 ) -> npt.NDArray[np.bool_]:
-    """Preprocess a mask"""
+    """Preprocess a mask of dimensions (H, W) or (H, W, C)"""
+    # Check if has a channel dimension, add if not
+    if len(mask.shape) == 2:
+        mask = np.expand_dims(mask, axis=-1)
     mask = resize_mask(mask, model_image_size)
     return mask
