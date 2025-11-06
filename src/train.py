@@ -13,6 +13,7 @@ from dvclive import Live
 from dvclive.keras import DVCLiveCallback
 from ruamel.yaml import YAML
 
+from augmentation import flip_and_rotate, zoom_and_shift
 from unet import unet_model
 from preprocess import preprocess_image, preprocess_mask
 
@@ -43,6 +44,10 @@ def image_data_generator(
             image = np.load(data_dir / f"image_{index}.npy")
             ground_truth = np.load(data_dir / f"mask_{index}.npy").astype(bool)
 
+            # Augment images and masks
+            image, ground_truth = zoom_and_shift(image, ground_truth)
+            image, ground_truth = flip_and_rotate(image, ground_truth)
+
             # Preprocess the image and mask
             image = preprocess_image(
                 image=image,
@@ -57,10 +62,6 @@ def image_data_generator(
                 mask=ground_truth,
                 model_image_size=model_image_size,
             )
-
-            # TODO: Augment the images: Scale and translate
-
-            # TODO: Augment images: Flipping and rotate
 
             # Add the image and ground truth to the batch
             batch_input.append(image)
