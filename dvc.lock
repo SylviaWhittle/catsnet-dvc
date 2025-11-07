@@ -17,7 +17,9 @@ stages:
         base:
           random_seed: 0
           model_image_size: 256
-          loss_function: iou_loss
+          loss_function: keras_dice
+          metrics:
+          - keras_iou
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
@@ -51,18 +53,20 @@ stages:
       nfiles: 252
     - path: src/train.py
       hash: md5
-      md5: 4d4712b0fe4315585e141a8c940653a6
-      size: 9226
+      md5: 331d7ce5dfde45c305db4674d5c6b9ee
+      size: 9404
     - path: src/unet.py
       hash: md5
-      md5: 61803ae98395201945088de33d223d1c
-      size: 8608
+      md5: e58e56f140011f2ca293e5bb3013ebe1
+      size: 11421
     params:
       params.yaml:
         base:
           random_seed: 0
           model_image_size: 256
-          loss_function: iou_loss
+          loss_function: keras_dice
+          metrics:
+          - keras_iou
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
@@ -81,12 +85,12 @@ stages:
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 6d7cc253df9791b31ca01dc81479d799
-      size: 23462221
+      md5: 95549014475a0c55e15c501258cda183
+      size: 23462508
     - path: results/train/
       hash: md5
-      md5: 19b503409bc3da961548e44ec11ce3aa.dir
-      size: 680
+      md5: e14ebceb4bc51511949b3b43f030a8c7.dir
+      size: 666
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -98,22 +102,24 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 6d7cc253df9791b31ca01dc81479d799
-      size: 23462221
+      md5: 95549014475a0c55e15c501258cda183
+      size: 23462508
     - path: src/evaluate.py
       hash: md5
-      md5: 6229e9ae7f9be54ea6d145bc14134e72
-      size: 8085
+      md5: 534aad0a6f793f1a4af1b8dba1667a80
+      size: 7874
     - path: src/unet.py
       hash: md5
-      md5: 61803ae98395201945088de33d223d1c
-      size: 8608
+      md5: e58e56f140011f2ca293e5bb3013ebe1
+      size: 11421
     params:
       params.yaml:
         base:
           random_seed: 0
           model_image_size: 256
-          loss_function: iou_loss
+          loss_function: keras_dice
+          metrics:
+          - keras_iou
           norm_upper_bound: 7
           norm_lower_bound: -1
           filter_channels:
@@ -127,6 +133,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: 8af7d3ab9badee4b64bdcd80c46abd0a.dir
-      size: 3025325
+      md5: c153b2e6a636094af7205b851e569b6f.dir
+      size: 2406082
       nfiles: 17

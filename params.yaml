@@ -2,7 +2,8 @@ base:
   random_seed: 0
   model_image_size: 256
   # Loss needs to be here since both train and evaluate need it
-  loss_function: iou_loss # Options: binary_crossentropy, iou_loss, dice_loss
+  loss_function: "keras_dice" # Options: binary_crossentropy, iou_loss, dice_loss
+  metrics: ["keras_iou"] # Options: accuracy, iou_loss, dice_loss, keras_iou
   norm_upper_bound: 7
   norm_lower_bound: -1
   filter_channels: ["original", "hessian"] # Options: original, hessian

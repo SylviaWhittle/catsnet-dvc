@@ -14,7 +14,7 @@ from dvclive.keras import DVCLiveCallback
 from ruamel.yaml import YAML
 
 from augmentation import flip_and_rotate, zoom_and_shift
-from unet import unet_model
+from unet import unet_model, get_loss_function, get_metric_functions
 from preprocess import preprocess_image, preprocess_mask
 
 yaml = YAML(typ="safe")
@@ -98,6 +98,7 @@ def train_model(
     hessian_sigma: int,
     validation_split: float,
     loss_function: str,
+    metrics: list[str] | None,
 ):
     """Train a model to segment images."""
 
@@ -171,7 +172,8 @@ def train_model(
         image_channels=len(filter_channels),
         learning_rate=learning_rate,
         activation_function=activation_function,
-        loss_function=loss_function,
+        loss_function=get_loss_function(loss_function),
+        metrics=get_metric_functions(metrics),
     )
 
     steps_per_epoch = len(train_indexes) // batch_size
@@ -252,4 +254,5 @@ if __name__ == "__main__":
         hessian_sigma=base_params["hessian_sigma"],
         validation_split=train_params["validation_split"],
         loss_function=base_params["loss_function"],
+        metrics=base_params["metrics"],
     )
