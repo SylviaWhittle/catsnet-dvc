@@ -1,6 +1,7 @@
 """Scripts for preprocessing images before passing to the model."""
 
 from PIL import Image
+from loguru import logger
 import numpy as np
 import numpy.typing as npt
 # pylint: disable=no-name-in-module
@@ -63,12 +64,23 @@ def apply_hessian_filter(
     """Apply a Hessian filter to the image"""
     hessian_matrix_image = hessian_matrix(image, sigma=sigma, order="rc", use_gaussian_derivatives=False)
     hessian_maximas, hessian_minimas = hessian_matrix_eigvals(hessian_matrix_image)
+
     if hessian_component == "minima":
-        return hessian_minimas
+        hessian_image = hessian_minimas
     elif hessian_component == "maxima":
-        return hessian_maximas
+        hessian_image = hessian_maximas
     else:
         raise ValueError(f"Invalid hessian_component value: {hessian_component}. Must be 'minima' or 'maxima'.")
+
+    # Normalise the hessian image to [0, 1]
+    vmin, vmax = np.percentile(hessian_image, (1.0, 99.0))
+    if vmax - vmin == 0:
+        # In case of a completely uniform image, return nothing.
+        logger.warning("Hessian image has zero variance; returning zeros.")
+        return np.zeros_like(hessian_image)
+    hessian_image = np.clip(hessian_image, vmin, vmax)
+    hessian_image = (hessian_image - vmin) / (vmax - vmin)
+    return hessian_image
 
 def preprocess_image(
     image: npt.NDArray[np.float64],

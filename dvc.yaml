@@ -16,6 +16,8 @@ stages:
     - data/train/
     - src/train.py
     - src/unet.py
+    - src/preprocess.py
+    - src/augmentation.py
     params:
     - base
     - train
@@ -35,11 +37,8 @@ stages:
     outs:
     - results/evaluate/
 metrics:
-- results/train/metrics.json
 - results/evaluate/metrics.json
 plots:
-- results/train/plots/metrics:
-    x: step
 - results/evaluate/plots/images
 artifacts:
   catsnet_model:
