@@ -51,14 +51,22 @@ stages:
       md5: b863265b49281c883ce49f3d3365369a.dir
       size: 128923456
       nfiles: 252
+    - path: src/augmentation.py
+      hash: md5
+      md5: c7853be9112ca4721c15c957d680a970
+      size: 2579
+    - path: src/preprocess.py
+      hash: md5
+      md5: d2a632b1a04f4d882af56ff4090e4a4e
+      size: 4401
     - path: src/train.py
       hash: md5
       md5: 331d7ce5dfde45c305db4674d5c6b9ee
       size: 9404
     - path: src/unet.py
       hash: md5
-      md5: e58e56f140011f2ca293e5bb3013ebe1
-      size: 11421
+      md5: c2283670bc6b42653455df5a92e9081f
+      size: 11479
     params:
       params.yaml:
         base:
@@ -78,19 +86,19 @@ stages:
           train_data_dir: data/train/
           model_save_dir: models/
           batch_size: 5
-          epochs: 5
+          epochs: 50
           activation_function: relu
           learning_rate: 0.0001
           validation_split: 0.2
     outs:
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 95549014475a0c55e15c501258cda183
+      md5: 23dfd4f7db89ec1130f30cd2727b93ec
       size: 23462508
     - path: results/train/
       hash: md5
-      md5: e14ebceb4bc51511949b3b43f030a8c7.dir
-      size: 666
+      md5: a0886072f50c73c2d144c45f719aa26e.dir
+      size: 4684
       nfiles: 5
   evaluate:
     cmd: python src/evaluate.py
@@ -102,7 +110,7 @@ stages:
       nfiles: 64
     - path: models/catsnet_model.keras
       hash: md5
-      md5: 95549014475a0c55e15c501258cda183
+      md5: 23dfd4f7db89ec1130f30cd2727b93ec
       size: 23462508
     - path: src/evaluate.py
       hash: md5
@@ -110,8 +118,8 @@ stages:
       size: 7874
     - path: src/unet.py
       hash: md5
-      md5: e58e56f140011f2ca293e5bb3013ebe1
-      size: 11421
+      md5: c2283670bc6b42653455df5a92e9081f
+      size: 11479
     params:
       params.yaml:
         base:
@@ -133,6 +141,6 @@ stages:
     outs:
     - path: results/evaluate/
       hash: md5
-      md5: c153b2e6a636094af7205b851e569b6f.dir
-      size: 2406082
+      md5: 21a5943991390992ac363759209a7db7.dir
+      size: 2087477
       nfiles: 17
