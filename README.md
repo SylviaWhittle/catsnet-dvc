@@ -10,7 +10,7 @@ For UoS staff who want to try this out:
 - Clone this repo
 - Create a new conda environment (works on 3.10 for me)
 - Install the required packages `pip install -r requirements.txt`
-- Download the data automatically using DVC: `dvc pull`. This will take a few minutes as Google Drive's servers are slow.
+- Add your data to the `data/all_data/` directory (this should be your sequentially named images and mask files: `image_X.npy`, `mask_X.npy`)
 
 - You can then have a look at the experiments via `dvc exp show` and `dvc exp list`
 - You can have a look at the processing pipeline via `dvc dag` and `cat .dvc.yaml`
@@ -22,8 +22,4 @@ For UoS staff who want to try this out:
 ## Branching
 
 If you want to upload your own experiment, try creating a branch with a descriptive name and running one, change the code if you like too, DVC seems to be able to handle that. Then message me to add you as a contributor and you can push your experiment.
-
-## DVC Studio
-
-I'll be looking into using DVC Studio soon to host the experiments. Here is a link to some info on [sharing experiments](https://dvc.org/doc/user-guide/experiment-management/sharing-experiments).
 
